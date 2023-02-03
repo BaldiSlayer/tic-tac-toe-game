@@ -1,0 +1,56 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = #1050#1083#1080#1077#1085#1090
+  ClientHeight = 356
+  ClientWidth = 654
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ChatRichEdit: TRichEdit
+    Left = 192
+    Top = 8
+    Width = 435
+    Height = 284
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Lines.Strings = (
+      'ChatRichEdit')
+    ParentFont = False
+    ReadOnly = True
+    TabOrder = 0
+    Zoom = 100
+  end
+  object Edit1: TEdit
+    Left = 192
+    Top = 298
+    Width = 369
+    Height = 30
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -18
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    Text = 'Edit1'
+  end
+  object SendButton: TButton
+    Left = 567
+    Top = 298
+    Width = 60
+    Height = 31
+    Caption = 'Send'
+    TabOrder = 2
+  end
+end

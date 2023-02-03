@@ -1,0 +1,313 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
+  System.Win.ScktComp;
+
+type
+  TForm1 = class(TForm)
+    Timer1: TTimer;
+    BackScreen: TImage;
+    Edit1: TEdit;
+    Label1: TLabel;
+    Button1: TButton;
+    ClientSocket1: TClientSocket;
+    Label2: TLabel;
+    Edit2: TEdit;
+    procedure Timer1Timer(Sender: TObject);
+    procedure BackScreenClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure ClientSocket1Error(Sender: TObject; Socket: TCustomWinSocket;
+      ErrorEvent: TErrorEvent; var ErrorCode: Integer);
+    procedure ClientSocket1Read(Sender: TObject; Socket: TCustomWinSocket);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+  kletka = record
+    x1, y1, x2, y2: integer;
+    figure: byte;
+    // 0-в клетке ничего нет, 1-в клетке крестик, 2 - в клетке нолик
+  end;
+
+const
+  k1 = 30 * 4;
+  k2 = 30 * 8;
+  k3 = 30 * 12;
+  otstup = 5;
+
+var
+  Form1: TForm1;
+  playing_field: array [1 .. 9] of kletka;
+  i, koeff: byte;
+  ID, enemy_nick: string;
+  Nolik, can_check: boolean;
+
+implementation
+
+{$R *.dfm}
+
+procedure preparing_for_the_game();
+begin
+  koeff := 1;
+  for i := 1 to 9 do
+  begin
+    case i of
+      1:
+        begin
+          playing_field[i].x1 := 0;
+          playing_field[i].y1 := 0;
+          playing_field[i].x2 := k1 * koeff;
+          playing_field[i].y2 := k1 * koeff;
+        end;
+
+      2:
+        begin
+          playing_field[i].x1 := k1 * koeff;
+          playing_field[i].y1 := 0;
+          playing_field[i].x2 := k2 * koeff;
+          playing_field[i].y2 := k1 * koeff;
+        end;
+
+      3:
+        begin
+          playing_field[i].x1 := k2 * koeff;
+          playing_field[i].y1 := 0;
+          playing_field[i].x2 := k3 * koeff;
+          playing_field[i].y2 := k1 * koeff;
+        end;
+
+      4:
+        begin
+          playing_field[i].x1 := 0;
+          playing_field[i].y1 := k1 * koeff;
+          playing_field[i].x2 := k1 * koeff;
+          playing_field[i].y2 := k2 * koeff;
+        end;
+
+      5:
+        begin
+          playing_field[i].x1 := k1 * koeff;
+          playing_field[i].y1 := k1 * koeff;
+          playing_field[i].x2 := k2 * koeff;
+          playing_field[i].y2 := k2 * koeff;
+        end;
+
+      6:
+        begin
+          playing_field[i].x1 := k2 * koeff;
+          playing_field[i].y1 := k1 * koeff;
+          playing_field[i].x2 := k3 * koeff;
+          playing_field[i].y2 := k2 * koeff;
+        end;
+
+      7:
+        begin
+          playing_field[i].x1 := 0;
+          playing_field[i].y1 := k2 * koeff;
+          playing_field[i].x2 := k1 * koeff;
+          playing_field[i].y2 := k3 * koeff;
+        end;
+
+      8:
+        begin
+          playing_field[i].x1 := k1 * koeff;
+          playing_field[i].y1 := k2 * koeff;
+          playing_field[i].x2 := k2 * koeff;
+          playing_field[i].y2 := k3 * koeff;
+        end;
+
+      9:
+        begin
+          playing_field[i].x1 := k2 * koeff;
+          playing_field[i].y1 := k2 * koeff;
+          playing_field[i].x2 := k3 * koeff;
+          playing_field[i].y2 := k3 * koeff;
+        end;
+    end;
+    playing_field[i].figure := 0;
+  end;
+end;
+
+procedure Drawing();
+begin
+  // отрисовка игрового поля
+  for i := 1 to 9 do
+  begin
+    Form1.BackScreen.Canvas.Pen.Color := clBlack;
+    Form1.BackScreen.Canvas.Pen.Width := 1;
+    Form1.BackScreen.Canvas.Rectangle(playing_field[i].x1, playing_field[i].y1,
+      playing_field[i].x2, playing_field[i].y2);
+  end;
+  // отрисовка ходов
+  for i := 1 to 9 do
+    if playing_field[i].figure <> 0 then
+      case playing_field[i].figure of
+        1: // крестик
+          begin
+            Form1.BackScreen.Canvas.Pen.Width := 5;
+            Form1.BackScreen.Canvas.Pen.Color := clRed;
+
+            Form1.BackScreen.Canvas.Moveto(playing_field[i].x1 + otstup * koeff,
+              playing_field[i].y1 + otstup * koeff);
+            Form1.BackScreen.Canvas.Lineto(playing_field[i].x2 - otstup * koeff,
+              playing_field[i].y2 - otstup * koeff);
+            Form1.BackScreen.Canvas.Moveto(playing_field[i].x1 + otstup * koeff,
+              playing_field[i].y2 - otstup * koeff);
+            Form1.BackScreen.Canvas.Lineto(playing_field[i].x2 - otstup * koeff,
+              playing_field[i].y1 + otstup * koeff);
+          end;
+        2: // нолик
+          begin
+            Form1.BackScreen.Canvas.Pen.Width := 5;
+            Form1.BackScreen.Canvas.Pen.Color := clBlue;
+
+            Form1.BackScreen.Canvas.Ellipse(playing_field[i].x1 + 5 * koeff,
+              playing_field[i].y1 + 5 * koeff, playing_field[i].x2 - 5 * koeff,
+              playing_field[i].y2 - 5 * koeff);
+          end;
+      end;
+end;
+
+procedure TForm1.BackScreenClick(Sender: TObject);
+var
+  p: TPoint;
+  make_a_move_x, make_a_move_y: boolean;
+begin
+  if can_check then
+  begin
+    p.X := ScreenToClient(Mouse.CursorPos).X;
+    p.Y := ScreenToClient(Mouse.CursorPos).Y;
+    for i := 1 to 9 do
+    begin
+      make_a_move_x := (playing_field[i].x1 < p.X) and
+        (p.X < playing_field[i].x2);
+      make_a_move_y := (playing_field[i].y1 < p.Y) and
+        (p.Y < playing_field[i].y2);
+
+      if make_a_move_x and make_a_move_y then
+      begin
+        if playing_field[i].figure = 0 then
+        begin
+          if Nolik then
+          begin
+            playing_field[i].figure := 2; // нолик
+            ClientSocket1.Socket.SendText('55552' + IntToStr(i) + enemy_nick);
+          end
+          else
+          begin
+            playing_field[i].figure := 1; // крестик
+            ClientSocket1.Socket.SendText('55551' + IntToStr(i) + enemy_nick);
+          end;
+        end;
+        can_check := False;
+        break;
+      end;
+    end;
+  end;
+end;
+
+//  Form1.Timer1.Enabled := True;
+//  Form1.Timer1.Interval := 50;
+//  preparing_for_the_game();
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  with Form1 do
+  begin
+    Label1.Visible := False;
+    Edit1.Visible := False;
+    Label2.Visible := False;
+    Edit2.Visible := False;
+    Button1.Visible := False;
+    with ClientSocket1 do
+    begin
+      Port := 1337;
+      Address := Edit2.Text;
+      Open;
+    end;
+    ID := Edit1.Text;
+  end;
+end;
+
+procedure TForm1.ClientSocket1Error(Sender: TObject; Socket: TCustomWinSocket;
+  ErrorEvent: TErrorEvent; var ErrorCode: Integer);
+begin
+  if ErrorCode = 10061 then
+    ShowMessage('Сервер выключен')
+  else
+    ShowMessage('Ошибка і = ' + IntToStr(ErrorCode));
+  ErrorCode := 0;
+end;
+
+procedure TForm1.ClientSocket1Read(Sender: TObject; Socket: TCustomWinSocket);
+var Msg: string;
+    Cmd, case_, j: integer;
+begin
+  Msg := Socket.ReceiveText; {Забрать сообщение}
+  Cmd := StrToInt(Copy(Msg, 1, 4));      {Копировать первые 4 символа. Команда состоит из 4-х символов}
+  Delete(Msg, 1, 4);
+  case cmd of
+    1000: //Добавление пользователя
+      Socket.SendText('1000' + ID);
+    9999:
+      begin
+        Form1.Timer1.Enabled := True;
+        Form1.Timer1.Interval := 50;
+        preparing_for_the_game();
+
+        //нолик или крестик
+        if StrToInt(Copy(Msg, 1, 1)) = 2 then
+        begin
+          Nolik := True;
+          can_check := True;
+        end
+        else
+          if StrToInt(Copy(Msg, 1, 1)) = 1 then
+          begin
+            Nolik := False;
+            can_check := True;
+          end;
+        Delete(Msg, 1, 1);
+
+        //ник противника
+        enemy_nick := Msg;
+        Form1.Caption := 'Крестики-нолики. Вы играете против ' + Msg;
+      end;
+    5555:
+      begin
+        //'55551' + IntToStr(i)
+
+        case_ := StrToInt(Copy(Msg, 1, 1));
+        Delete(Msg, 1, 1);
+
+        j := StrToInt(Copy(Msg, 1, 1));
+        Delete(Msg, 1, 1);
+
+        playing_field[i].figure := case_;
+      end;
+  end;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+
+
+//  Form1.Timer1.Enabled := True;
+//  Form1.Timer1.Interval := 50;
+//  preparing_for_the_game();
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  Drawing();
+end;
+
+end.

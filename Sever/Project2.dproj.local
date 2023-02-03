@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.423,D:\Программирование\Pascal\Delphi 10.3\Оконные\Windows\Мое\Чат\Сервер\Unit1.dfm=D:\Мои документы\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.898,=D:\Мои документы\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.050,D:\Программирование\Pascal\Delphi 10.3\Оконные\Windows\Мое\Чат\Сервер\Project2.dproj=D:\Мои документы\Embarcadero\Studio\Projects\Project2.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.423,D:\Программирование\Pascal\Delphi 10.3\Оконные\Windows\Мое\Чат\Сервер\Unit1.pas=D:\Мои документы\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

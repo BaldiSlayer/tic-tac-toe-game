@@ -1,0 +1,87 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = #1050#1088#1077#1089#1090#1080#1082#1080'-'#1085#1086#1083#1080#1082#1080
+  ClientHeight = 396
+  ClientWidth = 362
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object BackScreen: TImage
+    Left = 0
+    Top = 0
+    Width = 360
+    Height = 360
+    OnClick = BackScreenClick
+  end
+  object Label1: TLabel
+    Left = 16
+    Top = 8
+    Width = 30
+    Height = 18
+    Caption = #1053#1080#1082':'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Top = 35
+    Width = 19
+    Height = 18
+    Caption = 'IP:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Edit1: TEdit
+    Left = 52
+    Top = 8
+    Width = 121
+    Height = 21
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 16
+    Top = 59
+    Width = 89
+    Height = 30
+    Caption = #1054#1090#1087#1088#1072#1074#1080#1090#1100
+    TabOrder = 1
+    OnClick = Button1Click
+  end
+  object Edit2: TEdit
+    Left = 52
+    Top = 32
+    Width = 121
+    Height = 21
+    TabOrder = 2
+    Text = '127.0.0.1'
+  end
+  object Timer1: TTimer
+    Left = 328
+    Top = 8
+  end
+  object ClientSocket1: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnRead = ClientSocket1Read
+    OnError = ClientSocket1Error
+    Left = 312
+    Top = 112
+  end
+end
